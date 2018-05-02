@@ -14,4 +14,6 @@ contract IRefungibleToken {
 
     function getDivisibility() public constant returns (uint256);
 
+    function removeFromCirculation(uint256 _tokens) public;
+
 }

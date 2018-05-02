@@ -89,6 +89,12 @@ contract RefungibleToken is Ownable, IRefungibleToken {
 
 	}
 
+	function removeFromCirculation(uint256 _tokens) public onlySmartToken {
+
+		inCirculation = inCirculation.sub(_tokens);
+
+	}
+
 	function getDivisibility() public constant returns (uint256) {
 
 		return _divisibility;

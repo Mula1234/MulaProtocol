@@ -1,8 +1,11 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.17;
+
 import './ERC20Token.sol';
 import './TokenHolder.sol';
 import './Owned.sol';
 import './interfaces/ISmartToken.sol';
+import 'contracts/mulaInterfaces/IRefungibleToken.sol';
+import 'contracts/utils/math/SafeMath.sol';
 
 /*
     Smart Token v0.3
@@ -10,6 +13,11 @@ import './interfaces/ISmartToken.sol';
     'Owned' is specified here for readability reasons
 */
 contract SmartToken is ISmartToken, Owned, ERC20Token, TokenHolder {
+
+    using SafeMath for uint256;
+
+    IRefungibleToken refungible;
+
     string public version = '0.3';
 
     bool public transfersEnabled = true;    // true if transfer/transferFrom are enabled, false if not
@@ -20,6 +28,8 @@ contract SmartToken is ISmartToken, Owned, ERC20Token, TokenHolder {
     event Issuance(uint256 _amount);
     // triggered when the total supply is decreased
     event Destruction(uint256 _amount);
+
+    event SetRefungibleToken(address _token);
 
     /**
         @dev constructor
@@ -41,6 +51,13 @@ contract SmartToken is ISmartToken, Owned, ERC20Token, TokenHolder {
         _;
     }
 
+    modifier notRefungibleSmartToken {
+
+        require(address(refungible) == address(0));
+        _;
+
+    }
+
     /**
         @dev disables/enables transfers
         can only be called by the contract owner
@@ -49,6 +66,16 @@ contract SmartToken is ISmartToken, Owned, ERC20Token, TokenHolder {
     */
     function disableTransfers(bool _disable) public ownerOnly {
         transfersEnabled = !_disable;
+    }
+
+    function setRefungibleToken(address _token) public ownerOnly {
+
+        require(_token != address(0));
+
+        refungible = IRefungibleToken(_token);
+
+        SetRefungibleToken(_token);
+
     }
 
     /**
@@ -64,6 +91,15 @@ contract SmartToken is ISmartToken, Owned, ERC20Token, TokenHolder {
         validAddress(_to)
         notThis(_to)
     {
+
+        if (address(refungible) != address(0)) {
+
+            require(refungible.getDivisibility() >= totalSupply.add(_amount));
+
+            refungible.addInCirculation(_amount);
+
+        }
+
         totalSupply = safeAdd(totalSupply, _amount);
         balanceOf[_to] = safeAdd(balanceOf[_to], _amount);
 
@@ -79,13 +115,21 @@ contract SmartToken is ISmartToken, Owned, ERC20Token, TokenHolder {
         @param _amount     amount to decrease the supply by
     */
     function destroy(address _from, uint256 _amount) public {
+        
         require(msg.sender == _from || msg.sender == owner); // validate input
+
+        if (address(refungible) != address(0)) {
+
+            refungible.removeFromCirculation(_amount);
+
+        }
 
         balanceOf[_from] = safeSub(balanceOf[_from], _amount);
         totalSupply = safeSub(totalSupply, _amount);
 
         Transfer(_from, this, _amount);
         Destruction(_amount);
+
     }
 
     // ERC20 standard method overrides with some extra functionality
