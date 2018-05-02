@@ -8,7 +8,7 @@ const BancorGasPriceLimit = artifacts.require('contracts/bancor/BancorGasPriceLi
 const BancorQuickConverter = artifacts.require('contracts/bancor/BancorQuickConverter.sol');
 const BancorConverterExtensions = artifacts.require('contracts/bancor/BancorConverterExtensions.sol');
 const TestERC20Token = artifacts.require('contracts/bancor/helpers/TestERC20Token.sol');
-const utils = require('contracts/bancor/Utils');
+const utils = require('./helpers/Utils');
 
 const weight10Percent = 100000;
 const gasPrice = 22000000000;
