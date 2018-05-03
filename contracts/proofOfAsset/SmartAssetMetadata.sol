@@ -2,7 +2,6 @@ pragma solidity ^0.4.15;
 
 import 'contracts/zeppelin/Destructible.sol';
 
-
 contract SmartAssetMetadata is Destructible {
 
     mapping(bytes16 => address) smartAssetLogicAddresses;

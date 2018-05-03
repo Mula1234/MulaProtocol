@@ -20,7 +20,7 @@ contract SmartAssetLogicStorage is Destructible {
         _;
     }
 
-    function CarAssetLogicStorage() public {
+    function SmartAssetLogicStorage() public {
 
         assetLogic = msg.sender;
 

@@ -1,13 +1,13 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.17;
 
 //import "./DhOraclizeBase.sol";
 import "./SmartAssetLogicStorage.sol";
 
-contract RealEstateAssetLogic {
+contract CollectibleAssetLogic {
 
     SmartAssetLogicStorage assetLogicStorage;
 
-    function RealEstateAssetLogic() {
+    function CollectibleAssetLogic() {
         
         assetLogicStorage = new SmartAssetLogicStorage();
 
@@ -17,23 +17,18 @@ contract RealEstateAssetLogic {
         assetLogicStorage.setSmartAssetAvailabilityData(availability);
     }
 
-    function initialRealEstateData(uint256 nrOfIdenticalEstates, uint timestamp, uint256 year, bytes32 docUrl, bytes32 propertyType, bytes32 email, uint256 governmentNumber, bytes32 _address, bytes32 _empty, uint256 sqm, bytes32 state, bytes32 assetType) private returns(bool) {
+    function initialCollectibleData(uint256 nrSameCollectibles, uint timestamp, bytes32 docUrl, bytes32 _type, bytes32 _name, uint256 id, bytes32 featuresHash) private returns(bool) {
     
         assetLogicStorage.setSmartAssetData(
-        nrOfIdenticalEstates,
+        nrSameCollectibles,
         sha256(
-        nrOfIdenticalEstates,
+        nrSameCollectibles,
         timestamp, 
-        year, 
         docUrl, 
-        propertyType, 
-        email, 
-        governmentNumber, 
-        _address, 
-        _empty, 
-        sqm, 
-        state, 
-        assetType)
+        _type, 
+        _name, 
+        id, 
+        featuresHash)
         );
 
         return true;
@@ -51,23 +46,18 @@ contract RealEstateAssetLogic {
         return checkState(nrCars, timestamp, docUrl, smoker, email, model, vin, color, millage);
     } 
 
-    function checkState(uint256 nrEstates, uint timestamp, uint256 year, bytes32 docUrl, bytes32 propertyType, bytes32 email, uint256 governmentNumber, bytes32 _address, bytes32 _empty, uint256 sqm, bytes32 state, bytes32 assetType) private returns(bool) {
+    function checkState(uint256 nrSameCollectibles, uint timestamp, bytes32 docUrl, bytes32 _type, bytes32 _name, uint256 id, bytes32 featuresHash) private returns(bool) {
         
         var hash = assetLogicStorage.getSmartAssetData();
 
         return sha256(
-        nrEstates,
+        nrSameCollectibles,
         timestamp, 
-        year, 
         docUrl, 
-        propertyType, 
-        email, 
-        governmentNumber, 
-        _address, 
-        _empty, 
-        sqm, 
-        state, 
-        assetType
+        _type, 
+        _name, 
+        id, 
+        featuresHash
         ) == hash;
 
     } */

@@ -1,13 +1,13 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.17;
 
 //import "./DhOraclizeBase.sol";
 import "./SmartAssetLogicStorage.sol";
 
-contract RealEstateAssetLogic {
+contract ProductServiceAssetLogic {
 
     SmartAssetLogicStorage assetLogicStorage;
 
-    function RealEstateAssetLogic() {
+    function ProductServiceAssetLogic() {
         
         assetLogicStorage = new SmartAssetLogicStorage();
 
@@ -17,23 +17,17 @@ contract RealEstateAssetLogic {
         assetLogicStorage.setSmartAssetAvailabilityData(availability);
     }
 
-    function initialRealEstateData(uint256 nrOfIdenticalEstates, uint timestamp, uint256 year, bytes32 docUrl, bytes32 propertyType, bytes32 email, uint256 governmentNumber, bytes32 _address, bytes32 _empty, uint256 sqm, bytes32 state, bytes32 assetType) private returns(bool) {
+    function initialProductServiceData(uint timestamp, bytes32 docUrl, bytes32 _name, bytes32 description, bytes32 trademark) private returns(bool) {
     
         assetLogicStorage.setSmartAssetData(
-        nrOfIdenticalEstates,
+        1,
         sha256(
-        nrOfIdenticalEstates,
+        1,
         timestamp, 
-        year, 
-        docUrl, 
-        propertyType, 
-        email, 
-        governmentNumber, 
-        _address, 
-        _empty, 
-        sqm, 
-        state, 
-        assetType)
+        docUrl,
+        _name, 
+        description, 
+        trademark)
         );
 
         return true;
@@ -51,23 +45,17 @@ contract RealEstateAssetLogic {
         return checkState(nrCars, timestamp, docUrl, smoker, email, model, vin, color, millage);
     } 
 
-    function checkState(uint256 nrEstates, uint timestamp, uint256 year, bytes32 docUrl, bytes32 propertyType, bytes32 email, uint256 governmentNumber, bytes32 _address, bytes32 _empty, uint256 sqm, bytes32 state, bytes32 assetType) private returns(bool) {
+    function checkState(uint timestamp, bytes32 docUrl, bytes32 _name, bytes32 description, bytes32 trademark) private returns(bool) {
         
         var hash = assetLogicStorage.getSmartAssetData();
 
         return sha256(
-        nrEstates,
+        1,
         timestamp, 
-        year, 
-        docUrl, 
-        propertyType, 
-        email, 
-        governmentNumber, 
-        _address, 
-        _empty, 
-        sqm, 
-        state, 
-        assetType
+        docUrl,
+        _name, 
+        description, 
+        trademark
         ) == hash;
 
     } */

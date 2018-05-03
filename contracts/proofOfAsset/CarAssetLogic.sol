@@ -1,6 +1,6 @@
 pragma solidity ^0.4.15;
 
-import "./DhOraclizeBase.sol";
+//import "./DhOraclizeBase.sol";
 import "./SmartAssetLogicStorage.sol";
 
 
@@ -84,7 +84,7 @@ contract CarAssetLogic {
  /*   function isAssetTheSameState() onlySmartAssetRouter constant returns (bool) {
         var(nrCars, timestamp, year, docUrl, smoker, email, model, vin, color, millage, state, owner, assetType) = getById();
         return checkState(nrCars, timestamp, docUrl, smoker, email, model, vin, color, millage);
-    } */
+    } 
 
     function checkState(uint256 nrCars, uint timestamp, bytes32 docUrl, uint8 smoker, bytes32 email, bytes32 model, bytes32 vin, bytes32 color, uint millage) private returns(bool) {
         
@@ -102,7 +102,7 @@ contract CarAssetLogic {
         millage
         ) == hash;
 
-    }
+    } */
 
     /**
         * Gets all cities that have been added to this contract
