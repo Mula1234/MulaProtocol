@@ -1,8 +1,6 @@
 pragma solidity ^0.4.15;
 
-
-import './SmartAssetLogicInterface.sol';
-import 'zeppelin-solidity/contracts/lifecycle/Destructible.sol';
+import 'contracts/zeppelin//Destructible.sol';
 
 
 /**
@@ -37,7 +35,7 @@ contract SmartAssetInterface {
 /**
  * @title Base smart asset logic contract
  */
-contract BaseAssetLogic is SmartAssetLogicInterface, Destructible {
+contract BaseAssetLogic is Destructible {
     address smartAssetAddr;
     address smartAssetRouterAddr;
 
@@ -80,14 +78,6 @@ contract BaseAssetLogic is SmartAssetLogicInterface, Destructible {
 
     function getSmartAssetAvailability(uint24 assetId) constant returns (bool) {
         return true;
-    }
-
-    function calculateDeliveryPrice(uint24 assetId, bytes32 param) constant returns (uint) {
-        return 0;
-    }
-
-    function calculateDeliveryPrice(uint24 assetId, bytes11 latitudeTo, bytes11 longitudeTo) constant returns (uint) {
-        return 0;
     }
 
     function isAssetTheSameState(uint24 assetId) constant returns (bool sameState) {

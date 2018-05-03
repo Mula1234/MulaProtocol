@@ -1,6 +1,6 @@
 pragma solidity ^0.4.15;
 
-import 'zeppelin-solidity/contracts/lifecycle/Destructible.sol';
+import 'contracts/zeppelin/Destructible.sol';
 import './BankExCertifiedStorage.sol';
 
 

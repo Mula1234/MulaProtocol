@@ -1,7 +1,7 @@
-pragma solidity ^0.4.18;
+pragma solidity ^0.4.17;
 
 
-import "../ownership/Ownable.sol";
+import "contracts/utils/Ownable.sol";
 
 
 /**

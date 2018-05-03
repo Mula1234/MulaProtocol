@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 import "./DhOraclizeBase.sol";
-import "./CarAssetLogicStorage.sol";
+import "./SmartAssetLogicStorage.sol";
 
 
 contract IotSimulationInterface {
@@ -13,23 +13,11 @@ contract IotSimulationInterface {
 /**
  * @title Car smart asset logic  contract
  */
-contract CarAssetLogic is DhOraclizeBase {
-    uint private MIN_CAR_PRICE = 1;
-    uint private MAX_CAR_PRICE = 10;
+contract CarAssetLogic {
 
     address private iotSimulationAddr;
 
-    CarAssetLogicStorage carAssetLogicStorage;
-
-    /**
-    * Coefficient to calculate delivery price. E.g price = distance * coefficient
-    */
-    uint coefficient = 2226389000000000;
-
-    /**
-    * Coefficient to calculate car price.
-    */
-    uint priceCoefficient = 4452778000000000;
+    SmartAssetLogicStorage assetLogicStorage;
 
     /**
     * City that have been added to this contract with their lat longs
@@ -58,44 +46,21 @@ contract CarAssetLogic is DhOraclizeBase {
     }
 
     function CarAssetLogic() {
-        cityMapping["Moscow"] = LatLong("55", "37", true);
-        cities.push("Moscow");
-
-        cityMapping["Saint-Petersburg"] = LatLong("59", "30", true);
-        cities.push("Saint-Petersburg");
-
-
-        cityMapping["Kiev"] = LatLong("50", "30", true);
-        cities.push("Kiev");
-
-        cityMapping["Lviv"] = LatLong("49", "24", true);
-        cities.push("Lviv");
-
-        cityMapping["Lublin"] = LatLong("51", "22", true);
-        cities.push("Lublin");
+        
+        assetLogicStorage = new SmartAssetLogicStorage();
 
     }
 
-    function updateAvailability(uint24 assetId, bool availability) internal {
-        carAssetLogicStorage.setSmartAssetAvailabilityData(assetId, availability);
+    function updateAvailability(bool availability) internal {
+        assetLogicStorage.setSmartAssetAvailabilityData(availability);
     }
 
-    function onAssetSold(uint24 assetId) onlySmartAssetRouter {
-        carAssetLogicStorage.deleteAssetPriceById(assetId);
-    }
-
-    function calculateAssetPrice(uint24 assetId) onlySmartAssetRouter returns (uint) {
-        var(timestamp, year, docUrl, smoker, email, model, vin, color, millage, state, owner, assetType) = getById(assetId);
-        return calculateAssetPrice0(assetId, timestamp, docUrl, smoker, email, model, vin, color, millage);
-    }
-
-    function calculateAssetPrice0(uint24 assetId, uint timestamp, bytes32 docUrl, uint8 smoker, bytes32 email, bytes32 model, bytes32 vin , bytes32 color, uint millage) private returns(uint) {
-        uint price = _calculateAssetPrice(millage, smoker);
-
-        carAssetLogicStorage.setSmartAssetPriceData(
-        assetId,
-        price,
+    function initialCarData(uint256 nrOfIdenticalCars, uint timestamp, bytes32 docUrl, uint8 smoker, bytes32 email, bytes32 model, bytes32 vin, bytes32 color, uint millage) private returns(bool) {
+    
+        assetLogicStorage.setSmartAssetData(
+        nrOfIdenticalCars,
         sha256(
+        nrOfIdenticalCars,
         timestamp,
         docUrl,
         smoker,
@@ -106,24 +71,27 @@ contract CarAssetLogic is DhOraclizeBase {
         millage)
         );
 
-        return price;
+        return true;
+
     }
 
-    function getSmartAssetPrice(uint24 id) constant returns (uint) {
-        var (price, hash) = carAssetLogicStorage.getSmartAssetPriceData(id);
+    function getSmartAssetPrice() constant returns (uint256) {
 
-        return price;
-    }
+        return assetLogicStorage.getSmartAssetPrice();
+      
+    } 
 
-    function isAssetTheSameState(uint24 assetId) onlySmartAssetRouter constant returns (bool) {
-        var(timestamp, year, docUrl, smoker, email, model, vin, color, millage, state, owner, assetType) = getById(assetId);
-        return checkState(assetId, timestamp, docUrl, smoker, email, model, vin, color, millage);
-    }
+ /*   function isAssetTheSameState() onlySmartAssetRouter constant returns (bool) {
+        var(nrCars, timestamp, year, docUrl, smoker, email, model, vin, color, millage, state, owner, assetType) = getById();
+        return checkState(nrCars, timestamp, docUrl, smoker, email, model, vin, color, millage);
+    } */
 
-    function checkState(uint24 assetId, uint timestamp, bytes32 docUrl, uint8 smoker, bytes32 email, bytes32 model, bytes32 vin , bytes32 color, uint millage) private returns(bool) {
-        var (price, hash) = carAssetLogicStorage.getSmartAssetPriceData(assetId);
+    function checkState(uint256 nrCars, uint timestamp, bytes32 docUrl, uint8 smoker, bytes32 email, bytes32 model, bytes32 vin, bytes32 color, uint millage) private returns(bool) {
+        
+        var hash = assetLogicStorage.getSmartAssetData();
 
         return sha256(
+        nrCars,
         timestamp,
         docUrl,
         smoker,
@@ -133,6 +101,7 @@ contract CarAssetLogic is DhOraclizeBase {
         color,
         millage
         ) == hash;
+
     }
 
     /**
@@ -143,18 +112,9 @@ contract CarAssetLogic is DhOraclizeBase {
         return cities;
     }
 
-    function calculateDeliveryPrice(uint24 id, bytes11 latitudeTo, bytes11 longitudeTo) onlySmartAssetRouter constant returns (uint) {
-        return 10 * coefficient * 1 wei;
 
-    }
-
-    function calculateDeliveryPrice (uint24 id, bytes32 cityName) onlySmartAssetRouter constant returns(uint) {
-        LatLong latLong = cityMapping[cityName];
-        return calculateDeliveryPrice(id, latLong.lat, latLong.long);
-    }
-
-    function getSmartAssetAvailability(uint24 id) constant returns (bool availability) {
-        return carAssetLogicStorage.getSmartAssetAvailability(id);
+    function getSmartAssetAvailability() constant returns (bool availability) {
+        return assetLogicStorage.getSmartAssetAvailability();
     }
 
     /**
@@ -174,24 +134,6 @@ contract CarAssetLogic is DhOraclizeBase {
     }
 
     /**
-    * Sets coefficient for delivery price calculation in wei
-    *e.g 2226389000000000 ~ 0,0022 ether ~ 0.5 $
-    * @param _wei the coefficient to set
-    */
-    function setCoefficientInWei(uint _wei) onlyOwner() {
-        coefficient = _wei;
-    }
-
-    /**
-    * Sets coefficient for delivery price calculation in wei
-    *e.g 2226389000000000 ~ 0,0022 ether ~ 0.5 $
-    * @param _wei the coefficient to set
-    */
-    function setPriceCoefficientInWei(uint _wei) onlyOwner() {
-        priceCoefficient = _wei;
-    }
-
-    /**
      * @dev Setter for the SmartAsset contract address
      * @param contractAddress Address of the IotSimulation contract
      */
@@ -199,31 +141,6 @@ contract CarAssetLogic is DhOraclizeBase {
         require(contractAddress != address(0));
         iotSimulationAddr = contractAddress;
         return true;
-    }
-
-    /**
-     * @dev Setter for the Car min price - parameter for car price calculation
-     * @param price Min price of the car
-     */
-    function setMinCarPrice(uint price) onlyOwner returns (bool result) {
-        MIN_CAR_PRICE = price;
-        return true;
-    }
-
-    /**
-     * @dev Setter for the Car max price - parameter for car price calculation
-     * @param price Max price of the car
-     */
-    function setMaxCarPrice(uint price) onlyOwner returns (bool result) {
-        MAX_CAR_PRICE = price;
-        return true;
-    }
-
-    /**
-     * @dev Formula for car price calculation
-     */
-    function _calculateAssetPrice(uint millage, uint8 smoker) constant private returns (uint price) {
-        return min(max(millage % 10 - smoker, MIN_CAR_PRICE), MAX_CAR_PRICE) * priceCoefficient * 1 wei;
     }
 
     /**
